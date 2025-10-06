@@ -1,0 +1,6 @@
+com.evcharge.mobile.test.app-core-1.5.0-0 C:\Users\USER\.gradle\caches\transforms-3\7783b3abc159ef5f62835301fdb4d86c\transformed\core-1.5.0\res
+com.evcharge.mobile.test.app-annotation-experimental-1.3.0-1 C:\Users\USER\.gradle\caches\transforms-3\e01d97d307d83a639f934fc07375d6b1\transformed\annotation-experimental-1.3.0\res
+com.evcharge.mobile.test.app-androidTest-2 E:\EAD_Ass\EVChargingMobi\app\build\generated\res\resValues\androidTest\debug
+com.evcharge.mobile.test.app-mergeDebugAndroidTestResources-3 E:\EAD_Ass\EVChargingMobi\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.evcharge.mobile.test.app-mergeDebugAndroidTestResources-4 E:\EAD_Ass\EVChargingMobi\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.evcharge.mobile.test.app-merged_res-5 E:\EAD_Ass\EVChargingMobi\app\build\intermediates\merged_res\debugAndroidTest

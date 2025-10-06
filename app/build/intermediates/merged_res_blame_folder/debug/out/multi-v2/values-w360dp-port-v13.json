@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.evcharge.mobile.app-mergeDebugResources-58:/values-w360dp-port-v13/values-w360dp-port-v13.xml",
+            "outputFile": "com.evcharge.mobile.app-mergeDebugResources-57:/values-w360dp-port-v13/values-w360dp-port-v13.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\USER\\.gradle\\caches\\transforms-3\\4928eb47b6371b1f82a4caa22bdc63cf\\transformed\\material-1.11.0\\res\\values-w360dp-port-v13\\values-w360dp-port-v13.xml",
+                    "source": "C:\\Users\\USER\\.gradle\\caches\\transforms-3\\704c3af7b79bc68afeec2d97d028fdd2\\transformed\\material-1.9.0\\res\\values-w360dp-port-v13\\values-w360dp-port-v13.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",

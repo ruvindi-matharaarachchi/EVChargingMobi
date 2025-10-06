@@ -1,50 +1,50 @@
 [
     {
-        "merged": "com.evcharge.mobile.app-mergeDebugResources-59:/layout/activity_operator_host.xml",
-        "source": "com.evcharge.mobile.app-main-62:/layout/activity_operator_host.xml"
+        "merged": "com.evcharge.mobile.app-mergeDebugResources-58:/layout/fragment_my_bookings.xml",
+        "source": "com.evcharge.mobile.app-main-61:/layout/fragment_my_bookings.xml"
     },
     {
-        "merged": "com.evcharge.mobile.app-mergeDebugResources-59:/layout/activity_auth.xml",
-        "source": "com.evcharge.mobile.app-main-62:/layout/activity_auth.xml"
+        "merged": "com.evcharge.mobile.app-mergeDebugResources-58:/layout/fragment_bookings_list.xml",
+        "source": "com.evcharge.mobile.app-main-61:/layout/fragment_bookings_list.xml"
     },
     {
-        "merged": "com.evcharge.mobile.app-mergeDebugResources-59:/layout/activity_qr_code.xml",
-        "source": "com.evcharge.mobile.app-main-62:/layout/activity_qr_code.xml"
+        "merged": "com.evcharge.mobile.app-mergeDebugResources-58:/layout/activity_operator_host.xml",
+        "source": "com.evcharge.mobile.app-main-61:/layout/activity_operator_host.xml"
     },
     {
-        "merged": "com.evcharge.mobile.app-mergeDebugResources-59:/layout/fragment_my_bookings.xml",
-        "source": "com.evcharge.mobile.app-main-62:/layout/fragment_my_bookings.xml"
+        "merged": "com.evcharge.mobile.app-mergeDebugResources-58:/layout/item_booking.xml",
+        "source": "com.evcharge.mobile.app-main-61:/layout/item_booking.xml"
     },
     {
-        "merged": "com.evcharge.mobile.app-mergeDebugResources-59:/layout/fragment_bookings_list.xml",
-        "source": "com.evcharge.mobile.app-main-62:/layout/fragment_bookings_list.xml"
+        "merged": "com.evcharge.mobile.app-mergeDebugResources-58:/layout/activity_booking_confirm.xml",
+        "source": "com.evcharge.mobile.app-main-61:/layout/activity_booking_confirm.xml"
     },
     {
-        "merged": "com.evcharge.mobile.app-mergeDebugResources-59:/layout/activity_booking_confirm.xml",
-        "source": "com.evcharge.mobile.app-main-62:/layout/activity_booking_confirm.xml"
+        "merged": "com.evcharge.mobile.app-mergeDebugResources-58:/layout/activity_auth.xml",
+        "source": "com.evcharge.mobile.app-main-61:/layout/activity_auth.xml"
     },
     {
-        "merged": "com.evcharge.mobile.app-mergeDebugResources-59:/layout/activity_qr_scanner.xml",
-        "source": "com.evcharge.mobile.app-main-62:/layout/activity_qr_scanner.xml"
+        "merged": "com.evcharge.mobile.app-mergeDebugResources-58:/layout/activity_reservation.xml",
+        "source": "com.evcharge.mobile.app-main-61:/layout/activity_reservation.xml"
     },
     {
-        "merged": "com.evcharge.mobile.app-mergeDebugResources-59:/layout/activity_owner_host.xml",
-        "source": "com.evcharge.mobile.app-main-62:/layout/activity_owner_host.xml"
+        "merged": "com.evcharge.mobile.app-mergeDebugResources-58:/layout/activity_qr_scanner.xml",
+        "source": "com.evcharge.mobile.app-main-61:/layout/activity_qr_scanner.xml"
     },
     {
-        "merged": "com.evcharge.mobile.app-mergeDebugResources-59:/layout/item_booking.xml",
-        "source": "com.evcharge.mobile.app-main-62:/layout/item_booking.xml"
+        "merged": "com.evcharge.mobile.app-mergeDebugResources-58:/layout/fragment_profile.xml",
+        "source": "com.evcharge.mobile.app-main-61:/layout/fragment_profile.xml"
     },
     {
-        "merged": "com.evcharge.mobile.app-mergeDebugResources-59:/layout/activity_reservation.xml",
-        "source": "com.evcharge.mobile.app-main-62:/layout/activity_reservation.xml"
+        "merged": "com.evcharge.mobile.app-mergeDebugResources-58:/layout/activity_owner_host.xml",
+        "source": "com.evcharge.mobile.app-main-61:/layout/activity_owner_host.xml"
     },
     {
-        "merged": "com.evcharge.mobile.app-mergeDebugResources-59:/layout/fragment_owner_home.xml",
-        "source": "com.evcharge.mobile.app-main-62:/layout/fragment_owner_home.xml"
+        "merged": "com.evcharge.mobile.app-mergeDebugResources-58:/layout/fragment_owner_home.xml",
+        "source": "com.evcharge.mobile.app-main-61:/layout/fragment_owner_home.xml"
     },
     {
-        "merged": "com.evcharge.mobile.app-mergeDebugResources-59:/layout/fragment_profile.xml",
-        "source": "com.evcharge.mobile.app-main-62:/layout/fragment_profile.xml"
+        "merged": "com.evcharge.mobile.app-mergeDebugResources-58:/layout/activity_qr_code.xml",
+        "source": "com.evcharge.mobile.app-main-61:/layout/activity_qr_code.xml"
     }
 ]

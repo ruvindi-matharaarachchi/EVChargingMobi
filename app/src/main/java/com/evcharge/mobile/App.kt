@@ -20,10 +20,15 @@ class App : Application() {
         instance = this
         
         // Initialize WorkManager with custom factory for sync
-        val config = Configuration.Builder()
-            .setWorkerFactory(SyncWorkerFactory())
-            .build()
-        
-        WorkManager.initialize(this, config)
+        try {
+            val config = Configuration.Builder()
+                .setWorkerFactory(SyncWorkerFactory())
+                .build()
+            
+            WorkManager.initialize(this, config)
+        } catch (e: Exception) {
+            // Fallback to default WorkManager if custom factory fails
+            WorkManager.initialize(this, Configuration.Builder().build())
+        }
     }
 }

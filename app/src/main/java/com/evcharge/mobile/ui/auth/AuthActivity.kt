@@ -27,36 +27,51 @@ class AuthActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
         
-        val httpClient = HttpClient()
-        authApi = AuthApi(httpClient)
-        authSession = AuthSession(TokenStore(this), com.evcharge.mobile.App.instance.dbHelper)
-        
-        // Check if already logged in
-        if (authSession.isLoggedIn()) {
-            navigateToMainActivity()
-            return
+        try {
+            val httpClient = HttpClient()
+            authApi = AuthApi(httpClient)
+            authSession = AuthSession(TokenStore(this), com.evcharge.mobile.App.instance.dbHelper)
+            
+            // Check if already logged in
+            if (authSession.isLoggedIn()) {
+                navigateToMainActivity()
+                return
+            }
+            
+            setupViews()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "App initialization failed: ${e.message}", Toast.LENGTH_LONG).show()
         }
-        
-        setupViews()
     }
     
     private fun setupViews() {
-        val etNic = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_nic)
-        val etPassword = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_password)
-        val btnLogin = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_login)
-        val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
-        val tvError = findViewById<TextView>(R.id.tv_error)
-        
-        btnLogin.setOnClickListener {
-            val nic = etNic.text?.toString()?.trim()
-            val password = etPassword.text?.toString()
+        try {
+            val etNic = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_nic)
+            val etPassword = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.et_password)
+            val btnLogin = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_login)
+            val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
+            val tvError = findViewById<TextView>(R.id.tv_error)
             
-            if (nic.isNullOrEmpty() || password.isNullOrEmpty()) {
-                showError("Please enter both NIC and password")
-                return@setOnClickListener
+            if (etNic == null || etPassword == null || btnLogin == null) {
+                Toast.makeText(this, "UI elements not found", Toast.LENGTH_LONG).show()
+                return
             }
             
-            login(nic, password)
+            btnLogin.setOnClickListener {
+                val nic = etNic.text?.toString()?.trim()
+                val password = etPassword.text?.toString()
+                
+                if (nic.isNullOrEmpty() || password.isNullOrEmpty()) {
+                    showError("Please enter both NIC and password")
+                    return@setOnClickListener
+                }
+                
+                login(nic, password)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "UI setup failed: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
     
@@ -65,61 +80,85 @@ class AuthActivity : AppCompatActivity() {
         hideError()
         
         lifecycleScope.launch {
-            val result = authApi.login(nic, password)
-            
-            when (result) {
-                is Result.Success -> {
-                    val response = result.data
-                    authSession.saveSession(
-                        jwt = response.token,
-                        expiresAt = com.evcharge.mobile.util.Time.parseApiTimestamp(response.expiresAt),
-                        nic = response.nic,
-                        role = response.role,
-                        name = response.name
-                    )
-                    
-                    showLoading(false)
-                    navigateToMainActivity()
+            try {
+                val result = authApi.login(nic, password)
+                
+                when (result) {
+                    is Result.Success -> {
+                        val response = result.data
+                        authSession.saveSession(
+                            jwt = response.token,
+                            expiresAt = com.evcharge.mobile.util.Time.parseApiTimestamp(response.expiresAt),
+                            nic = response.nic,
+                            role = response.role,
+                            name = response.name
+                        )
+                        
+                        showLoading(false)
+                        navigateToMainActivity()
+                    }
+                    is Result.Error -> {
+                        showLoading(false)
+                        showError(result.message)
+                    }
                 }
-                is Result.Error -> {
-                    showLoading(false)
-                    showError(result.message)
-                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showLoading(false)
+                showError("Login failed: ${e.message}")
             }
         }
     }
     
     private fun navigateToMainActivity() {
-        val role = authSession.getRole()
-        val intent = when (role) {
-            "EVOwner" -> Intent(this, OwnerHostActivity::class.java)
-            "StationOperator" -> Intent(this, OperatorHostActivity::class.java)
-            else -> {
-                Toast.makeText(this, "Invalid role: $role", Toast.LENGTH_LONG).show()
-                return
+        try {
+            val role = authSession.getRole()
+            val intent = when (role) {
+                "EVOwner" -> Intent(this, OwnerHostActivity::class.java)
+                "StationOperator" -> Intent(this, OperatorHostActivity::class.java)
+                else -> {
+                    Toast.makeText(this, "Invalid role: $role", Toast.LENGTH_LONG).show()
+                    return
+                }
             }
+            
+            startActivity(intent)
+            finish()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Navigation failed: ${e.message}", Toast.LENGTH_LONG).show()
         }
-        
-        startActivity(intent)
-        finish()
     }
     
     private fun showLoading(show: Boolean) {
-        val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
-        val btnLogin = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_login)
-        
-        progressBar.visibility = if (show) View.VISIBLE else View.GONE
-        btnLogin.isEnabled = !show
+        try {
+            val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
+            val btnLogin = findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_login)
+            
+            progressBar?.visibility = if (show) View.VISIBLE else View.GONE
+            btnLogin?.isEnabled = !show
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
     
     private fun showError(message: String) {
-        val tvError = findViewById<TextView>(R.id.tv_error)
-        tvError.text = message
-        tvError.visibility = View.VISIBLE
+        try {
+            val tvError = findViewById<TextView>(R.id.tv_error)
+            tvError?.text = message
+            tvError?.visibility = View.VISIBLE
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        }
     }
     
     private fun hideError() {
-        val tvError = findViewById<TextView>(R.id.tv_error)
-        tvError.visibility = View.GONE
+        try {
+            val tvError = findViewById<TextView>(R.id.tv_error)
+            tvError?.visibility = View.GONE
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

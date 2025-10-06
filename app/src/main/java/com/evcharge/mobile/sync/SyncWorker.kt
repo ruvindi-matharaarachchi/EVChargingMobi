@@ -46,6 +46,11 @@ class SyncWorker(
                 
                 // Small delay between requests
                 delay(100)
+                
+                // Force garbage collection every 10 items to prevent memory buildup
+                if (successCount % 10 == 0) {
+                    System.gc()
+                }
             }
             
             if (successCount > 0) {

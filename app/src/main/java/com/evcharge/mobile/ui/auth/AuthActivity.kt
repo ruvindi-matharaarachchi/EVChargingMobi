@@ -39,6 +39,9 @@ class AuthActivity : AppCompatActivity() {
             }
             
             setupViews()
+            
+            // Check backend connectivity
+            checkBackendConnectivity()
         } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "App initialization failed: ${e.message}", Toast.LENGTH_LONG).show()
@@ -73,6 +76,19 @@ class AuthActivity : AppCompatActivity() {
             e.printStackTrace()
             Toast.makeText(this, "UI setup failed: ${e.message}", Toast.LENGTH_LONG).show()
         }
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        // Clear references to prevent memory leaks
+        // Note: authApi and authSession are lateinit, so we can't set them to null
+        // Instead, we'll rely on garbage collection
+    }
+    
+    override fun onLowMemory() {
+        super.onLowMemory()
+        // Clear caches when memory is low
+        System.gc()
     }
     
     private fun login(nic: String, password: String) {
@@ -159,6 +175,46 @@ class AuthActivity : AppCompatActivity() {
             tvError?.visibility = View.GONE
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+    
+    private fun checkBackendConnectivity() {
+        lifecycleScope.launch {
+            try {
+                // First check if network is available
+                if (!com.evcharge.mobile.App.instance.isNetworkAvailable()) {
+                    Toast.makeText(this@AuthActivity, "📡 No internet connection. Please check your network.", Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+                
+                // Test backend connectivity with health check
+                val httpClient = HttpClient()
+                val result = httpClient.checkBackendHealth()
+                
+                when (result) {
+                    is Result.Success -> {
+                        Toast.makeText(this@AuthActivity, "✅ Backend connected successfully!", Toast.LENGTH_SHORT).show()
+                    }
+                    is Result.Error -> {
+                        when {
+                            result.message.contains("Backend server is not running") -> {
+                                Toast.makeText(this@AuthActivity, "❌ Backend server is not running. Please start the .NET API server.", Toast.LENGTH_LONG).show()
+                            }
+                            result.message.contains("Connection timeout") -> {
+                                Toast.makeText(this@AuthActivity, "⏱️ Connection timeout. Check if backend server is running.", Toast.LENGTH_LONG).show()
+                            }
+                            result.message.contains("Cannot reach backend server") -> {
+                                Toast.makeText(this@AuthActivity, "🌐 Cannot reach backend server. Check network connection.", Toast.LENGTH_LONG).show()
+                            }
+                            else -> {
+                                Toast.makeText(this@AuthActivity, "⚠️ Backend connection issue: ${result.message}", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@AuthActivity, "❌ Failed to check backend connectivity: ${e.message}", Toast.LENGTH_LONG).show()
+            }
         }
     }
 }

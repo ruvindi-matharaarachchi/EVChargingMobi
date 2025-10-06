@@ -11,7 +11,16 @@ object Json {
         prettyPrint = false
     }
     
-    fun encodeToString(value: Any): String {
+    // Specific encode functions for our DTOs
+    fun encodeLoginRequest(value: LoginRequest): String {
+        return json.encodeToString(value)
+    }
+    
+    fun encodeBookingRequest(value: BookingRequest): String {
+        return json.encodeToString(value)
+    }
+    
+    fun encodeOwnerUpdateRequest(value: OwnerUpdateRequest): String {
         return json.encodeToString(value)
     }
     

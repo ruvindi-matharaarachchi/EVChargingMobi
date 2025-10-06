@@ -20,6 +20,12 @@ android {
         buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:5034\"")
         // To use port 5000 instead: change to "http://10.0.2.2:5000"
         // For physical device: use your PC's LAN IP like "http://192.168.1.100:5034"
+        
+        // Memory optimization
+        multiDexEnabled = true
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
+        }
     }
 
     buildTypes {
@@ -27,9 +33,12 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -69,6 +78,9 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.6.1")
     implementation("androidx.navigation:navigation-fragment-ktx:2.6.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.6.0")
+    
+    // Memory optimization
+    implementation("androidx.multidex:multidex:2.0.1")
     
     // Google Maps
     implementation("com.google.android.gms:play-services-maps:18.1.0")

@@ -4,6 +4,8 @@ import android.util.Log
 import com.evcharge.mobile.BuildConfig
 import com.evcharge.mobile.util.Json
 import com.evcharge.mobile.util.Result
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -26,125 +28,210 @@ class HttpClient {
         authToken = token
     }
     
-    fun get(path: String, params: Map<String, String> = emptyMap()): Result<String> {
-        return try {
-            val url = buildUrl(path, params)
-            val connection = createConnection(url, "GET")
-            
-            val responseCode = connection.responseCode
-            val response = if (responseCode in 200..299) {
-                readResponse(connection)
-            } else {
-                readErrorResponse(connection)
-            }
-            
-            connection.disconnect()
-            
-            if (responseCode in 200..299) {
-                Result.Success(response)
-            } else {
-                Result.Error("HTTP $responseCode: $response")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "GET request failed", e)
-            Result.Error("Network error: ${e.message}")
-        }
-    }
-    
-    fun post(path: String, body: Any? = null): Result<String> {
-        return try {
-            val url = URL(baseUrl + path)
-            val connection = createConnection(url, "POST")
-            
-            if (body != null) {
-                val jsonBody = Json.encodeToString(body)
-                connection.doOutput = true
-                connection.setRequestProperty("Content-Length", jsonBody.length.toString())
+    suspend fun checkBackendHealth(): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = URL(baseUrl + "/api/health")
+                val connection = createConnection(url, "GET")
                 
-                val writer = OutputStreamWriter(connection.outputStream)
-                writer.write(jsonBody)
-                writer.flush()
-                writer.close()
-            }
-            
-            val responseCode = connection.responseCode
-            val response = if (responseCode in 200..299) {
-                readResponse(connection)
-            } else {
-                readErrorResponse(connection)
-            }
-            
-            connection.disconnect()
-            
-            if (responseCode in 200..299) {
-                Result.Success(response)
-            } else {
-                Result.Error("HTTP $responseCode: $response")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "POST request failed", e)
-            Result.Error("Network error: ${e.message}")
-        }
-    }
-    
-    fun put(path: String, body: Any? = null): Result<String> {
-        return try {
-            val url = URL(baseUrl + path)
-            val connection = createConnection(url, "PUT")
-            
-            if (body != null) {
-                val jsonBody = Json.encodeToString(body)
-                connection.doOutput = true
-                connection.setRequestProperty("Content-Length", jsonBody.length.toString())
+                val responseCode = connection.responseCode
+                val response = if (responseCode in 200..299) {
+                    readResponse(connection)
+                } else {
+                    readErrorResponse(connection)
+                }
                 
-                val writer = OutputStreamWriter(connection.outputStream)
-                writer.write(jsonBody)
-                writer.flush()
-                writer.close()
+                connection.disconnect()
+                
+                if (responseCode in 200..299) {
+                    Result.Success(response)
+                } else {
+                    Result.Error("Backend health check failed: HTTP $responseCode")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Backend health check failed", e)
+                when {
+                    e.message?.contains("Connection refused") == true -> 
+                        Result.Error("Backend server is not running. Please start the .NET API server.")
+                    e.message?.contains("timeout") == true -> 
+                        Result.Error("Connection timeout. Check if backend server is running.")
+                    e.message?.contains("UnknownHostException") == true -> 
+                        Result.Error("Cannot reach backend server. Check network connection.")
+                    else -> Result.Error("Backend health check failed: ${e.message}")
+                }
             }
-            
-            val responseCode = connection.responseCode
-            val response = if (responseCode in 200..299) {
-                readResponse(connection)
-            } else {
-                readErrorResponse(connection)
-            }
-            
-            connection.disconnect()
-            
-            if (responseCode in 200..299) {
-                Result.Success(response)
-            } else {
-                Result.Error("HTTP $responseCode: $response")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "PUT request failed", e)
-            Result.Error("Network error: ${e.message}")
         }
     }
     
-    fun delete(path: String): Result<String> {
-        return try {
-            val url = URL(baseUrl + path)
-            val connection = createConnection(url, "DELETE")
-            
-            val responseCode = connection.responseCode
-            val response = if (responseCode in 200..299) {
-                readResponse(connection)
-            } else {
-                readErrorResponse(connection)
+    suspend fun get(path: String, params: Map<String, String> = emptyMap()): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = buildUrl(path, params)
+                val connection = createConnection(url, "GET")
+                
+                val responseCode = connection.responseCode
+                val response = if (responseCode in 200..299) {
+                    readResponse(connection)
+                } else {
+                    readErrorResponse(connection)
+                }
+                
+                connection.disconnect()
+                
+                if (responseCode in 200..299) {
+                    Result.Success(response)
+                } else {
+                    Result.Error("HTTP $responseCode: $response")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "GET request failed", e)
+                when {
+                    e.message?.contains("Connection refused") == true -> 
+                        Result.Error("Backend server is not running. Please start the .NET API server.")
+                    e.message?.contains("timeout") == true -> 
+                        Result.Error("Connection timeout. Check if backend server is running.")
+                    e.message?.contains("UnknownHostException") == true -> 
+                        Result.Error("Cannot reach backend server. Check network connection.")
+                    else -> Result.Error("Network error: ${e.message}")
+                }
             }
-            
-            connection.disconnect()
-            
-            if (responseCode in 200..299) {
-                Result.Success(response)
-            } else {
-                Result.Error("HTTP $responseCode: $response")
+        }
+    }
+    
+    suspend fun post(path: String, body: Any? = null): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = URL(baseUrl + path)
+                val connection = createConnection(url, "POST")
+                
+                if (body != null) {
+                    val jsonBody = when (body) {
+                        is LoginRequest -> Json.encodeLoginRequest(body)
+                        is BookingRequest -> Json.encodeBookingRequest(body)
+                        is OwnerUpdateRequest -> Json.encodeOwnerUpdateRequest(body)
+                        else -> throw IllegalArgumentException("Unsupported body type: ${body::class.simpleName}")
+                    }
+                    connection.doOutput = true
+                    connection.setRequestProperty("Content-Length", jsonBody.length.toString())
+                    
+                    val writer = OutputStreamWriter(connection.outputStream)
+                    writer.write(jsonBody)
+                    writer.flush()
+                    writer.close()
+                }
+                
+                val responseCode = connection.responseCode
+                val response = if (responseCode in 200..299) {
+                    readResponse(connection)
+                } else {
+                    readErrorResponse(connection)
+                }
+                
+                connection.disconnect()
+                
+                if (responseCode in 200..299) {
+                    Result.Success(response)
+                } else {
+                    Result.Error("HTTP $responseCode: $response")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "POST request failed", e)
+                when {
+                    e.message?.contains("Connection refused") == true -> 
+                        Result.Error("Backend server is not running. Please start the .NET API server.")
+                    e.message?.contains("timeout") == true -> 
+                        Result.Error("Connection timeout. Check if backend server is running.")
+                    e.message?.contains("UnknownHostException") == true -> 
+                        Result.Error("Cannot reach backend server. Check network connection.")
+                    else -> Result.Error("Network error: ${e.message}")
+                }
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "DELETE request failed", e)
-            Result.Error("Network error: ${e.message}")
+        }
+    }
+    
+    suspend fun put(path: String, body: Any? = null): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = URL(baseUrl + path)
+                val connection = createConnection(url, "PUT")
+                
+                if (body != null) {
+                    val jsonBody = when (body) {
+                        is LoginRequest -> Json.encodeLoginRequest(body)
+                        is BookingRequest -> Json.encodeBookingRequest(body)
+                        is OwnerUpdateRequest -> Json.encodeOwnerUpdateRequest(body)
+                        else -> throw IllegalArgumentException("Unsupported body type: ${body::class.simpleName}")
+                    }
+                    connection.doOutput = true
+                    connection.setRequestProperty("Content-Length", jsonBody.length.toString())
+                    
+                    val writer = OutputStreamWriter(connection.outputStream)
+                    writer.write(jsonBody)
+                    writer.flush()
+                    writer.close()
+                }
+                
+                val responseCode = connection.responseCode
+                val response = if (responseCode in 200..299) {
+                    readResponse(connection)
+                } else {
+                    readErrorResponse(connection)
+                }
+                
+                connection.disconnect()
+                
+                if (responseCode in 200..299) {
+                    Result.Success(response)
+                } else {
+                    Result.Error("HTTP $responseCode: $response")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "PUT request failed", e)
+                when {
+                    e.message?.contains("Connection refused") == true -> 
+                        Result.Error("Backend server is not running. Please start the .NET API server.")
+                    e.message?.contains("timeout") == true -> 
+                        Result.Error("Connection timeout. Check if backend server is running.")
+                    e.message?.contains("UnknownHostException") == true -> 
+                        Result.Error("Cannot reach backend server. Check network connection.")
+                    else -> Result.Error("Network error: ${e.message}")
+                }
+            }
+        }
+    }
+    
+    suspend fun delete(path: String): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = URL(baseUrl + path)
+                val connection = createConnection(url, "DELETE")
+                
+                val responseCode = connection.responseCode
+                val response = if (responseCode in 200..299) {
+                    readResponse(connection)
+                } else {
+                    readErrorResponse(connection)
+                }
+                
+                connection.disconnect()
+                
+                if (responseCode in 200..299) {
+                    Result.Success(response)
+                } else {
+                    Result.Error("HTTP $responseCode: $response")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "DELETE request failed", e)
+                when {
+                    e.message?.contains("Connection refused") == true -> 
+                        Result.Error("Backend server is not running. Please start the .NET API server.")
+                    e.message?.contains("timeout") == true -> 
+                        Result.Error("Connection timeout. Check if backend server is running.")
+                    e.message?.contains("UnknownHostException") == true -> 
+                        Result.Error("Cannot reach backend server. Check network connection.")
+                    else -> Result.Error("Network error: ${e.message}")
+                }
+            }
         }
     }
     

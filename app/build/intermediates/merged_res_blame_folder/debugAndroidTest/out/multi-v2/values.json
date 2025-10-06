@@ -4,7 +4,7 @@
             "outputFile": "com.evcharge.mobile.test.app-mergeDebugAndroidTestResources-3:/values/values.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\USER\\.gradle\\caches\\transforms-3\\def8373305d6c01c9cd1f0fc093a1c83\\transformed\\core-1.5.0\\res\\values\\values.xml",
+                    "source": "C:\\Users\\USER\\.gradle\\caches\\transforms-3\\983c36b7490a7bed016d93bbc20362b7\\transformed\\jetified-core-1.5.0\\res\\values\\values.xml",
                     "from": {
                         "startLines": "4,11",
                         "startColumns": "0,0",
